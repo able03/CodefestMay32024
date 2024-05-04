@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -56,6 +57,7 @@ public class EditAccountDataActivity extends AppCompatActivity {
         et_username.setText(AccountStaticClickedModel.getUsername());
         et_password.setText(AccountStaticClickedModel.getPassword());
 
+        Log.d("Debugging", "Static ID: " + AccountStaticClickedModel.getId());
 
         setListeners();
 
@@ -94,29 +96,30 @@ public class EditAccountDataActivity extends AppCompatActivity {
         });
 
         btn_update.setOnClickListener(new View.OnClickListener() {
-            int id = AccountStaticClickedModel.getId();
-            String name = et_name.getText().toString();
-            String address = et_address.getText().toString();
-            String bdate = et_bdate.getText().toString();
-            String contact = et_contact.getText().toString();
-            String username = et_username.getText().toString();
-            String password = et_password.getText().toString();
-
-            String pin = AccountStaticClickedModel.getPin();
 
             @Override
             public void onClick(View view) {
-                if(dbHelper.updateData(AccountStaticClickedModel.getId(), name, address, bdate, contact, username, password ))
+                int id = AccountStaticClickedModel.getId();
+                String name = et_name.getText().toString();
+                String address = et_address.getText().toString();
+                String bdate = et_bdate.getText().toString();
+                String contact = et_contact.getText().toString();
+                String username = et_username.getText().toString();
+                String password = et_password.getText().toString();
+
+                String pin = AccountStaticClickedModel.getPin();
+
+                if(dbHelper.updateData(id, name, address, bdate, contact, username, password ))
                 {
-                   /* SQLiteDatabase db = dbHelper.getReadableDatabase();
-                    Cursor cursor = db.rawQuery("SELECT name FROM Accounts WHERE id = '"+id+"'", null);
-                    Toast.makeText(EditAccountDataActivity.this, cursor.getString(1), Toast.LENGTH_SHORT).show();
-
-                    db.close();*/
-
-                    new AccountStaticModel(id, name, address, bdate, contact, username, password, pin);
-                    new AccountStaticClickedModel(id, name, address, bdate, contact, username, password, pin);
-                    startActivity(new Intent(EditAccountDataActivity.this, MainActivity.class));
+                    if(AccountStaticModel.getId() == id)
+                    {
+                        new AccountStaticModel(id, name, address,bdate, contact, username, password, AccountStaticModel.getPin());
+                        startActivity(new Intent(EditAccountDataActivity.this, MainActivity.class));
+                    }
+                    else
+                    {
+                        startActivity(new Intent(EditAccountDataActivity.this, MainActivity.class));
+                    }
                     Toast.makeText(EditAccountDataActivity.this, "Update success", Toast.LENGTH_SHORT).show();
                 }
                 else

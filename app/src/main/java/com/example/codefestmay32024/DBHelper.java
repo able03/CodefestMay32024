@@ -118,7 +118,6 @@ public class DBHelper extends SQLiteOpenHelper
 
         int rowsAffected = db.update("Accounts", values, selection, selectionArgs);
 
-
         if (rowsAffected > 0) {
             return true;
         } else {
@@ -173,6 +172,13 @@ public class DBHelper extends SQLiteOpenHelper
 
 
         return list;
+    }
+
+
+    public Cursor findAccountByPin(String pin)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM Accounts WHERE pin = '"+pin+"'", null);
     }
 
 }

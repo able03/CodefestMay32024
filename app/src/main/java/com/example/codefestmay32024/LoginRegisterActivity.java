@@ -1,6 +1,7 @@
 package com.example.codefestmay32024;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,13 +47,13 @@ public class LoginRegisterActivity extends AppCompatActivity {
 
     AlertDialog ad_login, ad_register, ad_pin;
 
-    View loginView, registerView, pinView;
-
     TextInputLayout lo_name, lo_address, lo_bdate, lo_contact, lo_username, lo_password,
             lo_username_login, lo_password_login;
 
     TextInputEditText et_name, et_address, et_bdate, et_contact,et_username, et_password,
             et_username_login, et_password_login;
+
+    EditText et1, et2, et3, et4;
 
 
     DBHelper dbHelper;
@@ -71,34 +73,62 @@ public class LoginRegisterActivity extends AppCompatActivity {
             return insets;
         });
 
-        initAlertBuilder();
-        setView();
-
         initValues();
+        showLoginDialog();
 
-         setListener();
-
-
-
-         start();
+        dbHelper.close();
     }
 
-    private void start()
-    {
-        adb_login.setView(loginView);
-        adb_login.setCancelable(false);
-        showLogin();
-    }
 
     private void initValues()
     {
+        notificationHelper = new NotificationHelper();dbHelper = new DBHelper(this);
+    }
 
-        btn_register = registerView.findViewById(R.id.btnRegister);
-        btn_login = loginView.findViewById(R.id.btnLogin);
+    private void showRegisterDialog()
+    {
+        View registerView = LayoutInflater.from(this).inflate(R.layout.register_dialog_layout, null);
+        initRegister(registerView);
 
-        tv_register_here = loginView.findViewById(R.id.tvJumpToRegister);
-        tv_use_pin_code = loginView.findViewById(R.id.tvUsePinCode);
+        adb_register = new AlertDialog.Builder(this);
+        adb_register.setView(registerView);
 
+        ad_register = adb_register.create();
+        ad_register.setCancelable(false);
+        ad_register.show();
+
+        tv_login_here.setOnClickListener(login -> {
+            ad_register.dismiss();
+            showLoginDialog();
+        });
+
+        cb_user.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if(isChecked)
+                {
+                    btn_register.setEnabled(true);
+                }
+                else
+                {
+                    btn_register.setEnabled(false);
+                }
+            }
+        });
+
+        btn_register.setOnClickListener(register -> {
+            registerProcess();
+        });
+
+    }
+
+
+
+
+    private void initRegister(View registerView)
+    {
         tv_login_here = registerView.findViewById(R.id.tvJumpToLogin);
 
         lo_name = registerView.findViewById(R.id.loName);
@@ -115,209 +145,205 @@ public class LoginRegisterActivity extends AppCompatActivity {
         et_username = registerView.findViewById(R.id.etUsernameRegis);
         et_password = registerView.findViewById(R.id.etPasswordRegis);
 
+        btn_register = registerView.findViewById(R.id.btnRegister);
+
+        cb_user = registerView.findViewById(R.id.cbUserAgreement);
+    }
+
+
+    private void showLoginDialog()
+    {
+        View loginView = LayoutInflater.from(this).inflate(R.layout.login_dialog_layout, null);
+        initLogin(loginView);
+
+
+        adb_login = new AlertDialog.Builder(this);
+        adb_login.setView(loginView);
+
+        ad_login = adb_login.create();
+        ad_login.setCancelable(false);
+        ad_login.show();
+
+
+        tv_register_here.setOnClickListener(register -> {
+            ad_login.dismiss();
+            showRegisterDialog();
+        });
+
+        tv_use_pin_code.setOnClickListener(usePin -> {
+            ad_login.dismiss();
+            showPinDialog();
+        });
+
+        btn_login.setOnClickListener(login -> {
+            String username = et_username_login.getText().toString().trim();
+            String password = et_password_login.getText().toString().trim();
+            loginProcess(username, password);
+        });
+    }
+
+    private void initLogin(View loginView)
+    {
+        btn_login = loginView.findViewById(R.id.btnLogin);
+
+        tv_register_here = loginView.findViewById(R.id.tvJumpToRegister);
+        tv_use_pin_code = loginView.findViewById(R.id.tvUsePinCode);
+
         lo_username_login = loginView.findViewById(R.id.loUsernameLogin);
         lo_password_login = loginView.findViewById(R.id.loPasswordLogin);
 
         et_username_login = loginView.findViewById(R.id.etUsernameLogin);
         et_password_login = loginView.findViewById(R.id.etPasswordLogin);
-
-
-        cb_user = registerView.findViewById(R.id.cbUserAgreement);
-
-        notificationHelper = new NotificationHelper();
     }
 
-    private void initAlertBuilder()
+
+
+    private void showPinDialog()
     {
-        adb_login = new AlertDialog.Builder(this);
-        adb_register = new AlertDialog.Builder(this);
+        View pinView = LayoutInflater.from(this).inflate(R.layout.pin_dialog_layout, null);
+        initPin(pinView);
+
         adb_pin = new AlertDialog.Builder(this);
-    }
-
-    private void setView()
-    {
-        loginView = LayoutInflater.from(this).inflate(R.layout.login_dialog_layout, null);
-        registerView = LayoutInflater.from(this).inflate(R.layout.register_dialog_layout, null);
-        pinView = LayoutInflater.from(this).inflate(R.layout.pin_dialog_layout, null);
-    }
-
-
-    private void showLogin()
-    {
-        ad_login = adb_login.show();
-    }
-
-    private void dismissRegister()
-    {
-        ad_register.dismiss();
-    }
-
-    private void dismissPin()
-    {
-        ad_pin.dismiss();
-    }
-
-
-    private void dismissLogin()
-    {
-        ad_login.dismiss();
-    }
-
-    private void showRegister()
-    {
-
-
-        ad_register = adb_register.show();
-    }
-
-    private void showPin()
-    {
-        ad_pin = adb_pin.show();
-    }
-
-
-
-    private void setListener()
-    {
-        tv_use_pin_code.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                adb_pin.setView(pinView);
-                dismissLogin();
-                showPin();
-            }
-        });
-
-
-        tv_register_here.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                adb_register.setView(registerView);
-                dismissLogin();
-                showRegister();
-            }
-        });
-
-
-        tv_login_here.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                adb_login.setView(loginView);
-                dismissRegister();
-                showLogin();
-            }
-        });
-
-
-
-        btn_register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               if(!empty() && !validate())
-               {
-                 registerProcess();
-               }
-            }
-        });
-
-
-        lo_bdate.setEndIconOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                String year = String.format("%04d", calendar.get(Calendar.YEAR));
-                String month = String.format("%02d", calendar.get(Calendar.MONTH));
-                String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
-
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(LoginRegisterActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                        et_bdate.setText(String.format("%04d", i) + "/" + String.format("%02d", i1+1) + "/" + String.format("%02d", i2));
-                    }
-                },Integer.parseInt(year),Integer.parseInt(month),Integer.parseInt(day));
-
-                datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
-                datePickerDialog.show();
-            }
-        });
-
-
-
-        lo_bdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                String year = String.format("%04d", calendar.get(Calendar.YEAR));
-                String month = String.format("%02d", calendar.get(Calendar.MONTH));
-                String day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH));
-
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(LoginRegisterActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year1, int month1, int day1) {
-                        et_bdate.setText(String.valueOf(String.format("%04d", year1)) + "/" + String.format("%02d", (month1+1)) + "/" + String.format("%02d", day1));
-                    }
-                },Integer.parseInt(year),Integer.parseInt(month),Integer.parseInt(day));
-
-                datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
-                datePickerDialog.show();
-            }
-        });
-
-
-        btn_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(checkLoginUsername() || checkLoginPassword())
+        adb_pin.setView(pinView)
+                .setTitle("Enter your pin code")
+                .setPositiveButton("submit", new DialogInterface.OnClickListener()
                 {
-                    dbHelper =  new DBHelper(LoginRegisterActivity.this);
-                    String username = et_username_login.getText().toString();
-                    String password = et_password_login.getText().toString();
-                    Cursor cursor = dbHelper.findAccount(username, password);
-                    if(cursor.moveToFirst())
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
                     {
-                        int id = cursor.getInt(0);
-                        String name = cursor.getString(1);
-                        String address = cursor.getString(2);
-                        String bdate = cursor.getString(3);
-                        String contact = cursor.getString(4);
-                        String user = cursor.getString(5);
-                        String pass = cursor.getString(6);
-                        String pin = cursor.getString(7);
-
-                        new AccountStaticModel(id, name, address, bdate, contact, user, pass, pin);
-                        startActivity(new Intent(LoginRegisterActivity.this, MainActivity.class));
+                        String str = et1.getText().toString() + et2.getText().toString() + et3.getText().toString() + et4.getText().toString();
+                        pinProcess(str);
                     }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        ad_pin.dismiss();
+                        showLoginDialog();
+                    }
+                })
+                .setCancelable(false);
+
+        ad_pin = adb_pin.create();
+        ad_pin.show();
 
 
+    }
 
-                    dbHelper.close();
+    private void initPin(View pinView)
+    {
+        et1 = pinView.findViewById(R.id.et1);
+        et2 = pinView.findViewById(R.id.et2);
+        et3 = pinView.findViewById(R.id.et3);
+        et4 = pinView.findViewById(R.id.et4);
+
+        et1.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                if(s.length() == 1)
+                {
+                    et2.requestFocus();
                 }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
             }
         });
 
-        cb_user.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        et2.addTextChangedListener(new TextWatcher()
+        {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b)
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                if(s.length() == 1)
                 {
-                    btn_register.setEnabled(true);
+                    et3.requestFocus();
                 }
-                else
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
+            }
+        });
+
+        et3.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                if(s.length() == 1)
                 {
-                    btn_register.setEnabled(false);
+                    et4.requestFocus();
                 }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
             }
         });
     }
+
+
+
+
+    private void pinProcess(String inputPin)
+    {
+        Cursor cursor = dbHelper.findAccountByPin(inputPin);
+        if(cursor.moveToFirst())
+        {
+            int id = cursor.getInt(0);
+            String name = cursor.getString(1);
+            String address = cursor.getString(2);
+            String bdate = cursor.getString(3);
+            String contact = cursor.getString(4);
+            String user = cursor.getString(5);
+            String pass = cursor.getString(6);
+            String pin = cursor.getString(7);
+
+            new AccountStaticModel(id, name, address, bdate, contact, user, pass, pin);
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
+        else
+        {
+            Toast.makeText(this, "Account not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
     private void registerProcess()
     {
-        dbHelper = new DBHelper(this);
+
         String name = et_name.getText().toString();
         String address = et_address.getText().toString();
         String bdate = et_bdate.getText().toString();
@@ -331,13 +357,38 @@ public class LoginRegisterActivity extends AppCompatActivity {
         if(dbHelper.addData(name, address, bdate, phone, username, password, pinCode))
         {
             notificationHelper.showNotification(this, "Codefest", pinCode);
-            Toast.makeText(this, "Successfully login", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Successfully registered", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show();
         }
 
 
+    }
 
+    private void loginProcess(String username, String password)
+    {
+        Cursor cursor = dbHelper.findAccount(username, password);
+        if(cursor.moveToFirst())
+        {
+            int id = cursor.getInt(0);
+            String name = cursor.getString(1);
+            String address = cursor.getString(2);
+            String bdate = cursor.getString(3);
+            String contact = cursor.getString(4);
+            String user = cursor.getString(5);
+            String pass = cursor.getString(6);
+            String pin = cursor.getString(7);
 
-        dbHelper.close();
+            new AccountStaticModel(id, name, address, bdate, contact, user, pass, pin);
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
+        else
+        {
+
+        }
     }
 
     private boolean checkLoginUsername() {
