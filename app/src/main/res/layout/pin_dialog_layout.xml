@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingVertical="20dp">
+
+
+    <EditText
+        android:id="@+id/et1"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pin_dialog_bg"
+        android:layout_marginEnd="10dp"
+        android:textAlignment="center"
+        android:textSize="60sp" />
+
+
+
+    <EditText
+        android:id="@+id/et2"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pin_dialog_bg"
+        android:layout_marginEnd="10dp"
+        android:textAlignment="center"
+        android:textSize="60sp" />
+
+
+
+    <EditText
+        android:id="@+id/et3"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pin_dialog_bg"
+        android:layout_marginEnd="10dp"
+        android:textAlignment="center"
+        android:textSize="60sp" />
+
+
+
+
+    <EditText
+        android:id="@+id/et4"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pin_dialog_bg"
+        android:textAlignment="center"
+        android:textSize="60sp" />
+
+
+</LinearLayout>
