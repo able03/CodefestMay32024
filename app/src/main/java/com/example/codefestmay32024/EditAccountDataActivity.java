@@ -47,9 +47,6 @@ public class EditAccountDataActivity extends AppCompatActivity {
 
         initValues();
 
-//        setData();
-
-
         et_name.setText(AccountStaticClickedModel.getName());
         et_address.setText(AccountStaticClickedModel.getAddress());
         et_bdate.setText(AccountStaticClickedModel.getBdate());
@@ -151,34 +148,6 @@ public class EditAccountDataActivity extends AppCompatActivity {
                 datePickerDialog.show();
             }
         });
-    }
-
-
-    private void setData()
-
-    {
-        int id = Integer.parseInt(getIntent().getStringExtra("id"));
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM WHERE id = '"+id+"'", null);
-
-        int id1 = cursor.getInt(0);
-        String name = cursor.getString(1);
-        String address = cursor.getString(2);
-        String bdate = cursor.getString(3);
-        String contact = cursor.getString(4);
-        String user = cursor.getString(5);
-        String pass = cursor.getString(6);
-        String pin = cursor.getString(7);
-
-
-        tv_id.setText(String.valueOf(id1));
-        et_name.setText(name);
-        et_address.setText(address);
-        et_bdate.setText(bdate);
-        et_contact.setText(contact);
-        et_username.setText(user);
-        et_password.setText(pass);
     }
 
 }
